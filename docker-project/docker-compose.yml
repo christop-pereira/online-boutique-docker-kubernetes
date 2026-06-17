@@ -1,0 +1,198 @@
+services:
+
+  redis:
+    image: redis:7-alpine
+    networks:
+      - backend-net
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
+  adservice:
+    build: ./src/adservice
+    image: ${REGISTRY}/adservice:${TAG:-latest}
+    environment:
+      PORT: "9555"
+    expose:
+      - "9555"
+    networks:
+      - frontend-net
+    restart: unless-stopped
+
+  cartservice:
+    build: ./src/cartservice
+    image: ${REGISTRY}/cartservice:${TAG:-latest}
+    environment:
+      ASPNETCORE_HTTP_PORTS: "7070"
+      REDIS_ADDR: "redis:6379"
+    expose:
+      - "7070"
+    depends_on:
+      - redis
+    networks:
+      - frontend-net
+      - backend-net
+    restart: unless-stopped
+
+  currencyservice:
+    build: ./src/currencyservice
+    image: ${REGISTRY}/currencyservice:${TAG:-latest}
+    environment:
+      PORT: "7000"
+      DISABLE_PROFILER: "1"
+    expose:
+      - "7000"
+    networks:
+      - frontend-net
+    restart: unless-stopped
+
+  emailservice:
+    build: ./src/emailservice
+    image: ${REGISTRY}/emailservice:${TAG:-latest}
+    environment:
+      PORT: "8081"
+    expose:
+      - "8081"
+    networks:
+      - backend-net
+    restart: unless-stopped
+
+  productcatalogservice:
+    build: ./src/productcatalogservice
+    image: ${REGISTRY}/productcatalogservice:${TAG:-latest}
+    expose:
+      - "3550"
+    networks:
+      - frontend-net
+      - backend-net
+    restart: unless-stopped
+
+  shippingservice:
+    build: ./src/shippingservice
+    image: ${REGISTRY}/shippingservice:${TAG:-latest}
+    environment:
+      PORT: "50051"
+      DISABLE_PROFILER: 1
+    networks:
+      - frontend-net
+      - backend-net
+    restart: unless-stopped
+
+  checkoutservice:
+    build: ./src/checkoutservice
+    image: ${REGISTRY}/checkoutservice:${TAG:-latest}
+    environment:
+      PORT: "5050"
+      CART_SERVICE_ADDR: "cartservice:7070"
+      CURRENCY_SERVICE_ADDR: "currencyservice:7000"
+      EMAIL_SERVICE_ADDR: "emailservice:8081"
+      PAYMENT_SERVICE_ADDR: "paymentservice:50052"
+      SHIPPING_SERVICE_ADDR: "shippingservice:50051"
+      PRODUCT_CATALOG_SERVICE_ADDR: "productcatalogservice:3550"
+    expose:
+      - "5050"
+    depends_on:
+      - cartservice
+      - currencyservice
+      - emailservice
+      - paymentservice
+      - shippingservice
+      - productcatalogservice
+    networks:
+      - frontend-net
+      - backend-net
+    restart: unless-stopped
+
+  paymentservice:
+    build: ./src/paymentservice
+    image: ${REGISTRY}/paymentservice:${TAG:-latest}
+    environment:
+      PORT: "50052"
+      DISABLE_PROFILER: "1"
+    expose:
+      - "50052"
+    networks:
+      - backend-net
+    restart: unless-stopped
+
+  recommendationservice:
+    build: ./src/recommendationservice
+    image: ${REGISTRY}/recommendationservice:${TAG:-latest}
+    environment:
+      PRODUCT_CATALOG_SERVICE_ADDR: "productcatalogservice:3550"
+      PORT: "8082"
+    depends_on:
+      - productcatalogservice
+    networks:
+      - frontend-net
+      - backend-net
+    restart: unless-stopped
+
+  frontend:
+    build: ./src/frontend
+    image: ${REGISTRY}/frontend:${TAG:-latest}
+    environment:
+      PORT: "8080"
+      PRODUCT_CATALOG_SERVICE_ADDR: "productcatalogservice:3550"
+      CURRENCY_SERVICE_ADDR: "currencyservice:7000"
+      CART_SERVICE_ADDR: "cartservice:7070"
+      RECOMMENDATION_SERVICE_ADDR: "recommendationservice:8082"
+      CHECKOUT_SERVICE_ADDR: "checkoutservice:5050"
+      SHIPPING_SERVICE_ADDR: "shippingservice:50051"
+      AD_SERVICE_ADDR: "adservice:9555"
+      SHOPPING_ASSISTANT_SERVICE_ADDR: "shoppingassistantservice:0000"
+      SELF_SIGNED_HOST: "boutique.local"
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      VIRTUAL_PORT: "8080"
+    expose:
+      - "8080"
+    depends_on:
+      - adservice
+      - cartservice
+      - checkoutservice
+      - currencyservice
+      - productcatalogservice
+      - recommendationservice
+      - shippingservice
+    networks:
+      - frontend-net
+      - proxy-net
+    restart: unless-stopped
+
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - nginx-certs:/etc/nginx/certs
+    networks:
+      - proxy-net
+    restart: unless-stopped
+
+  self-signed-companion:
+    image: sebastienheyd/self-signed-proxy-companion
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - nginx-certs:/etc/nginx/certs
+    depends_on:
+      - nginx-proxy
+    networks:
+      - proxy-net
+    restart: unless-stopped
+
+networks:
+  frontend-net:
+  backend-net:
+    internal: true
+  proxy-net:
+
+volumes:
+  nginx-certs:
+  redis_data:

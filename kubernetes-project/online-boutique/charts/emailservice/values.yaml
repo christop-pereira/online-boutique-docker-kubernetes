@@ -1,0 +1,16 @@
+replicaCount: 1
+
+image:
+  repository: registry.gitlab.unige.ch/pereira_oct/docker-project/emailservice
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 8081
+
+env:
+  - name: PORT
+    value: "8081"
+  - name: DISABLE_PROFILER
+    value: "1"

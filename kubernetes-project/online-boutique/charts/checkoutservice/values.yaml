@@ -1,0 +1,18 @@
+replicaCount: 1
+
+image:
+  repository: registry.gitlab.unige.ch/pereira_oct/docker-project/checkoutservice
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 5050
+
+config:
+  cartServiceAddr: "cartservice:7070"
+  currencyServiceAddr: "currencyservice:7000"
+  emailServiceAddr: "emailservice:8080"
+  paymentServiceAddr: "paymentservice:50052"
+  shippingServiceAddr: "shippingservice:50051"
+  productCatalogServiceAddr: "productcatalogservice:3550"

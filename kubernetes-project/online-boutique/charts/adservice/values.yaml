@@ -1,0 +1,14 @@
+replicaCount: 1
+
+image:
+  repository: registry.gitlab.unige.ch/pereira_oct/docker-project/adservice
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 9555
+
+env:
+  - name: PORT
+    value: "9555"

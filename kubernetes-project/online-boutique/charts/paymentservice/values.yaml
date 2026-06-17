@@ -1,0 +1,16 @@
+replicaCount: 1
+
+image:
+  repository: registry.gitlab.unige.ch/pereira_oct/docker-project/paymentservice
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 50052
+
+env:
+  - name: PORT
+    value: "50052"
+  - name: DISABLE_PROFILER
+    value: "1"

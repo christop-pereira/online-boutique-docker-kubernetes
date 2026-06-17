@@ -1,0 +1,16 @@
+replicaCount: 1
+
+image:
+  repository: registry.gitlab.unige.ch/pereira_oct/docker-project/cartservice
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 7070
+
+env:
+  - name: ASPNETCORE_HTTP_PORTS
+    value: "7070"
+  - name: REDIS_ADDR
+    value: "redis:6379"

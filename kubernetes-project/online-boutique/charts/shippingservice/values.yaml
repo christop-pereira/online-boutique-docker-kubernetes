@@ -1,0 +1,14 @@
+replicaCount: 1
+
+image:
+  repository: registry.gitlab.unige.ch/pereira_oct/docker-project/shippingservice
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 50051
+
+env:
+  - name: PORT
+    value: "50051"

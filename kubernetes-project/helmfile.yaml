@@ -1,0 +1,66 @@
+helmDefaults:
+  createNamespace: true
+
+releases:
+  - name: redis
+    chart: ./online-boutique/charts/redis
+    namespace: boutique-backend
+
+  - name: adservice
+    chart: ./online-boutique/charts/adservice
+    namespace: boutique-backend
+
+  - name: cartservice
+    chart: ./online-boutique/charts/cartservice
+    namespace: boutique-backend
+    needs:
+      - redis
+
+  - name: currencyservice
+    chart: ./online-boutique/charts/currencyservice
+    namespace: boutique-backend
+
+  - name: emailservice
+    chart: ./online-boutique/charts/emailservice
+    namespace: boutique-backend
+
+  - name: productcatalogservice
+    chart: ./online-boutique/charts/productcatalogservice
+    namespace: boutique-backend
+
+  - name: paymentservice
+    chart: ./online-boutique/charts/paymentservice
+    namespace: boutique-backend
+
+  - name: shippingservice
+    chart: ./online-boutique/charts/shippingservice
+    namespace: boutique-backend
+    
+  - name: recommendationservice
+    chart: ./online-boutique/charts/recommendationservice
+    namespace: boutique-backend
+    needs:
+      - boutique-backend/productcatalogservice
+
+  - name: checkoutservice
+    chart: ./online-boutique/charts/checkoutservice
+    namespace: boutique-backend
+    needs:
+      - boutique-backend/cartservice
+      - boutique-backend/currencyservice
+      - boutique-backend/emailservice
+      - boutique-backend/paymentservice
+      - boutique-backend/shippingservice
+      - boutique-backend/productcatalogservice
+
+  - name: frontend
+    chart: ./online-boutique/charts/frontend
+    namespace: boutique-frontend
+    needs:
+      - boutique-backend/adservice
+      - boutique-backend/cartservice
+      - boutique-backend/checkoutservice
+      - boutique-backend/currencyservice
+      - boutique-backend/productcatalogservice
+      - boutique-backend/recommendationservice
+      - boutique-backend/shippingservice
