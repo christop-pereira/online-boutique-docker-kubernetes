@@ -58,7 +58,7 @@ Le déploiement complet est centralisé via **Helmfile**, qui orchestre l'ensemb
 
 L'application est exposée via **Ingress NGINX**, avec un certificat TLS généré par **cert-manager** à partir d'un `ClusterIssuer` Let's Encrypt (environnement staging).
 
-➡️ Voir [`kubernetes-project/README.md`](./kubernetes/README.md) pour les instructions de déploiement.
+➡️ Voir [`kubernetes/README.md`](./kubernetes-project/README.md) pour les instructions de déploiement.
 
 ---
 
