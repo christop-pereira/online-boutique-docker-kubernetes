@@ -1,10 +1,5 @@
 ## Documentation Docker
 
-- **Project Repository**: https://gitlab.unige.ch/pereira_oct/docker-project
-- **Container Registry**: https://gitlab.unige.ch/pereira_oct/docker-project/container_registry
-
----
-
 ## Prérequis
 
 - Ajouter l'entrée suivante dans votre fichier hosts :
