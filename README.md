@@ -48,7 +48,7 @@ Chaque microservice a été conteneurisé avec un **Dockerfile** dédié, en sui
 
 L'ensemble est orchestré avec **Docker Compose**, avec un reverse proxy (**nginx-proxy**) gérant le trafic entrant et la terminaison SSL via un compagnon de certificats auto-signés.
 
-➡️ Voir [`docker/README.md`](./docker/README.md) pour les instructions de lancement.
+➡️ Voir [`docker/README.md`](./docker-project/README.md) pour les instructions de lancement.
 
 ## Partie 2 : Kubernetes
 
@@ -58,7 +58,7 @@ Le déploiement complet est centralisé via **Helmfile**, qui orchestre l'ensemb
 
 L'application est exposée via **Ingress NGINX**, avec un certificat TLS généré par **cert-manager** à partir d'un `ClusterIssuer` Let's Encrypt (environnement staging).
 
-➡️ Voir [`kubernetes/README.md`](./kubernetes/README.md) pour les instructions de déploiement.
+➡️ Voir [`kubernetes-project/README.md`](./kubernetes/README.md) pour les instructions de déploiement.
 
 ---
 
